@@ -2,6 +2,9 @@ package de.biomedical_imaging.ij.shapeSmoothing.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.net.URL;
+
 import ij.IJ;
 import ij.ImagePlus;
 import ij.blob.Blob;
@@ -26,7 +29,8 @@ public class ShapeSmoothingUtilTest {
 	private Shape_Smoothing shapeSmoothing;
 	
 	public ShapeSmoothingUtilTest() {
-		testImp = IJ.openImage(ShapeSmoothingUtilTest.class.getResource("testPic.tif").getPath());
+		 URL url = this.getClass().getClassLoader().getResource("testPic.tif");
+		testImp = new ImagePlus(url.getPath());
 		testIp = testImp.getProcessor();
 		width = testIp.getWidth();
 		height = testIp.getHeight();
