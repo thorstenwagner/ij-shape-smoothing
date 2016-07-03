@@ -9,7 +9,6 @@ import ij.gui.PolygonRoi;
 import ij.gui.Roi;
 import ij.measure.ResultsTable;
 import ij.plugin.frame.RoiManager;
-import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
 import java.awt.Color;
@@ -17,7 +16,6 @@ import java.awt.Frame;
 import java.awt.Polygon;
 import java.util.Vector;
 
-import de.biomedical_imaging.ij.shapeSmoothingPlugin.Shape_Smoothing;
 import de.biomedical_imaging.ij.shapeSmoothingSlow.ComplexNumber;
 import de.biomedical_imaging.ij.shapeSmoothingSlow.MyUsefulMethods;
 

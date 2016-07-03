@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
 
-import ij.IJ;
 import ij.ImagePlus;
 import ij.blob.Blob;
 import ij.blob.ManyBlobs;
@@ -16,7 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.biomedical_imaging.ij.shapeSmoothing.ShapeSmoothingUtil;
-import de.biomedical_imaging.ij.shapeSmoothingPlugin.Shape_Smoothing;
 
 public class ShapeSmoothingUtilTest {
 	
@@ -26,7 +24,6 @@ public class ShapeSmoothingUtilTest {
 	private int height;
 	private ImageProcessor newIp;
 	private ShapeSmoothingUtil shapeSmoothingUtil;
-	private Shape_Smoothing shapeSmoothing;
 	
 	public ShapeSmoothingUtilTest() {
 		 URL url = this.getClass().getClassLoader().getResource("testPic.tif");
@@ -35,7 +32,7 @@ public class ShapeSmoothingUtilTest {
 		width = testIp.getWidth();
 		height = testIp.getHeight();
 		shapeSmoothingUtil = new ShapeSmoothingUtil();
-		shapeSmoothing = new Shape_Smoothing();
+		//s/hapeSmoothing = new Shape_Smoothing();
 	}
 	
 	/**
@@ -145,7 +142,6 @@ public class ShapeSmoothingUtilTest {
 		for (Blob blob: allBlobs) {
 			newIp.drawPolygon(shapeSmoothingUtil.toEquidistantPolygon(blob.getOuterContour()));
 		}
-		ImagePlus newImp = new ImagePlus("", newIp);
 		
 		// Die Konturen an sich sind nicht (immer) skeletiert
 		//IJ.run(newImp, "Skeletonize", "");

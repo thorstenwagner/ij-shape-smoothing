@@ -1,28 +1,21 @@
 package de.biomedical_imaging.ij.shapeSmoothingPlugin;
 
 import java.awt.AWTEvent;
-import java.awt.Frame;
 import java.awt.Scrollbar;
 import java.awt.TextField;
 import java.awt.Choice;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.WindowManager;
 import ij.blob.ManyBlobs;
 import ij.blob.Blob;
 import ij.gui.DialogListener;
 import ij.gui.GenericDialog;
-import ij.gui.ImageWindow;
 import ij.gui.NewImage;
-import ij.gui.YesNoCancelDialog;
 import ij.plugin.filter.ExtendedPlugInFilter;
-import ij.plugin.filter.PlugInFilter;
 import ij.plugin.filter.PlugInFilterRunner;
-import ij.plugin.frame.RoiManager;
 import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
-import de.biomedical_imaging.ij.shapeSmoothing.DialogCancelledException;
 import de.biomedical_imaging.ij.shapeSmoothing.ShapeSmoothingUtil;
 
 /**
