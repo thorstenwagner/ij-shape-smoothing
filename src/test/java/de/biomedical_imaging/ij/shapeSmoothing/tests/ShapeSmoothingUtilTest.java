@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
 
+import ij.IJ;
 import ij.ImagePlus;
 import ij.blob.Blob;
 import ij.blob.ManyBlobs;
@@ -89,6 +90,7 @@ public class ShapeSmoothingUtilTest {
 		}
 		//shapeSmoothingUtil.fourierFilter(testImp, newIp, 1, false);
 		shapeSmoothingUtil.fourierFilter(testImp.getProcessor(), 1, false, false);
+
 		int sumFourierXCoord = 0;
 		int sumFourierYCoord = 0;
 		for (int x = 0; x < width; x++) {

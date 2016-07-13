@@ -38,11 +38,11 @@ import ij.process.ImageProcessor;
 import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Polygon;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import de.biomedical_imaging.ij.shapeSmoothingSlow.ComplexNumber;
 import de.biomedical_imaging.ij.shapeSmoothingSlow.MyUsefulMethods;
-
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
 /**
@@ -94,7 +94,7 @@ public class ShapeSmoothingUtil {
 		int c = 1;
 		for (Blob blob: allBlobs) {
 			double[] coef;
-			coef = fourierEngine(blob.getOuterContour(), thresholdValue, thresholdIsPercentual, ip,output);
+			coef = fourierEngine(blob.getOuterContour(), thresholdValue, thresholdIsPercentual, ip,output,false);
 			if(output && coef.length >= 4){
 				double f1 = Math.sqrt(Math.pow(coef[2],2)+Math.pow(coef[3],2));
 				rt.incrementCounter();
@@ -110,6 +110,29 @@ public class ShapeSmoothingUtil {
 				rt.show("Fourier Descriptors");
 			}
 			c++;
+			
+			ArrayList<Polygon> inner = blob.getInnerContours();
+			for (Polygon polygon : inner) {
+				coef = fourierEngine(polygon, thresholdValue, thresholdIsPercentual, ip,output,true);
+				if(output && coef.length >= 4){
+					double f1 = Math.sqrt(Math.pow(coef[2],2)+Math.pow(coef[3],2));
+					rt.incrementCounter();
+					rt.addValue("Blob Label", c);
+					for(int i = 0; i< coef.length-1; i=i+2){
+						
+						rt.showRowNumbers(false);
+						
+						//rt.addValue("R", coef[i]);
+					//	rt.addValue("I", coef[i+1]);
+						rt.addValue("|F" +i/2+ "|", Math.sqrt(Math.pow(coef[i],2)+Math.pow(coef[i+1],2))/f1);
+					}
+					rt.show("Fourier Descriptors");
+				}
+				c++;
+				
+			}
+			
+			
 		}
 		
 	}
@@ -135,7 +158,7 @@ public class ShapeSmoothingUtil {
 	 * @param ip {@link ImageProcessor} des Bildes, worauf das rücktransformierte Blob gezeichnet wird
 	 */
 	int objectCounter = 1;
-	private double[] fourierEngine(Polygon contourPolygon, double thresholdValue, boolean thresholdIsPercentual, ImageProcessor ip, boolean output) {
+	private double[] fourierEngine(Polygon contourPolygon, double thresholdValue, boolean thresholdIsPercentual, ImageProcessor ip, boolean output, boolean isInner) {
 		
 		Polygon equiCont = toEquidistantPolygon(contourPolygon);
 		int numOfContourPoints = equiCont.npoints;
@@ -205,14 +228,17 @@ public class ShapeSmoothingUtil {
 		}
 
 		if(blackBackground){
-			//IJ.setForegroundColor(255, 255, 255);
 			ip.setValue(255);
+			if(isInner){
+				ip.setValue(0);
+			}
 			
 		}else
 		{
 			ip.setValue(0);
-			//IJ.setForegroundColor(0, 0, 0);
-			
+			if(isInner){
+				ip.setValue(255);
+			}
 		}
 		Polygon poly = new Polygon(xpoints, ypoints, j);
 		// Zeichnen
