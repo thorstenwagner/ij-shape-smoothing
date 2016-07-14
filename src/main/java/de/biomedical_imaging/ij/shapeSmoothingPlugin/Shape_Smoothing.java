@@ -59,7 +59,7 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 	private boolean drawOnlyContours;
 	private boolean blackBackground;
 	private boolean doOutputDescriptors = false;
-	String[] absRelChoices = {"Relative proportion of FDs","Absolute number of FDs"};
+	String[] absRelChoices = {"Relative_proportion of FDs","Absolute_number of FDs"};
 	int maxNumOfFDs ;
 	int minNumOfFDs;
 	int numberOfBlobs;
@@ -126,8 +126,8 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 		gd.setCancelLabel("Cancel");
 		// gd.addMessage("There are " + numberOfBlobs + " objects (or contours) with " + minNumOfFDs + " to " + maxNumOfFDs + " Fourier Descriptors (FDs).");		
 		gd.addChoice("Keep (for each blob):", absRelChoices, absRelChoices[0]);
-		gd.addSlider("Relative proportion FDs (%)", 0, 100, 2);
-		gd.addSlider("Absolute number FDs", 1, maxNumOfFDs, 2);
+		gd.addSlider("Relative_proportion_FDs (%)", 0, 100, 2);
+		gd.addSlider("Absolute_number_FDs", 1, maxNumOfFDs, 2);
 		//dialogItemChanged(gd, null);
 		gd.addCheckbox("Draw only contours", false);
 		gd.addCheckbox("Output Descriptors", false);
