@@ -162,8 +162,10 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 	public boolean dialogItemChanged(GenericDialog geDi, AWTEvent e) {
 		thresholdValuePercentual = geDi.getNextNumber();
 		thresholdValueAbsolute = (int) geDi.getNextNumber();
+		String choice = geDi.getNextChoice();
 		modusChoice = (Choice) geDi.getChoices().get(0);
-		doAbsoluteThreshold = (modusChoice.getSelectedItem()== absRelChoices[1]);
+		
+		doAbsoluteThreshold = absRelChoices[1].equals(choice);
 		drawOnlyContours = geDi.getNextBoolean();
 		doOutputDescriptors = geDi.getNextBoolean();
 		blackBackground = geDi.getNextBoolean();
@@ -177,7 +179,7 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 		Scrollbar relScroll = (Scrollbar) geDi.getSliders().get(0);
 		TextField relTextField = (TextField) geDi.getNumericFields().get(0);
 
-		boolean relSelected = (modusChoice.getSelectedItem()==modusChoice.getItem(0));
+		boolean relSelected = absRelChoices[0].equals(choice);
 		absScroll.setEnabled(!relSelected);
 		absTextField.setEnabled(!relSelected);
 		relScroll.setEnabled(relSelected);
