@@ -165,7 +165,7 @@ public class ShapeSmoothingUtil {
 		
 		if (thresholdIsPercentual) {
 			thresholdValue = (thresholdValue * numOfContourPoints) / 100;
-			//
+			thresholdValue = thresholdValue<1?1:thresholdValue;
 		} else {
 			// thresholdValue darf nicht die Anzahl der Konturpunkte übersteigen!
 			if (thresholdValue > numOfContourPoints) {
