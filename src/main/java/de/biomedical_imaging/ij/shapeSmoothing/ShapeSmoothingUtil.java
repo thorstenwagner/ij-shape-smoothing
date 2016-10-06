@@ -54,6 +54,8 @@ public class ShapeSmoothingUtil {
 
 	private boolean onlyContours = false;
 	private boolean blackBackground = false;
+	private int minimumFD;
+	
 	/**
 	 * Fourier-Hintransformation, Filterung der Fourierdeskriptoren (FD) und Fourier-Rücktransformation
 	 * für alle Blobs auf einem Bild (referenziert mittels imp). 
@@ -137,7 +139,9 @@ public class ShapeSmoothingUtil {
 		
 	}
 	
-
+	public void setMinimumNumberOfFD(int minimum){
+		minimumFD = minimum;
+	}
 	
 	public void setDrawOnlyContours(boolean b){
 		onlyContours = b;
@@ -165,7 +169,7 @@ public class ShapeSmoothingUtil {
 		
 		if (thresholdIsPercentual) {
 			thresholdValue = (thresholdValue * numOfContourPoints) / 100;
-			thresholdValue = thresholdValue<1?1:thresholdValue;
+			thresholdValue = thresholdValue<minimumFD?minimumFD:thresholdValue;
 		} else {
 			// thresholdValue darf nicht die Anzahl der Konturpunkte übersteigen!
 			if (thresholdValue > numOfContourPoints) {

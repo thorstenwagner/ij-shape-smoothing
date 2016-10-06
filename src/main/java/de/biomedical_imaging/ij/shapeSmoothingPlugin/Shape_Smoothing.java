@@ -59,6 +59,8 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 	private boolean drawOnlyContours;
 	private boolean blackBackground;
 	private boolean doOutputDescriptors = false;
+	private boolean useMinimum = false;
+	private int minimum;
 	String[] absRelChoices = {"Relative_proportion of FDs","Absolute_number of FDs"};
 	int maxNumOfFDs ;
 	int minNumOfFDs;
@@ -70,6 +72,7 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 		
 		//imp = ensureCorrectLUT(imp);
 		shapeSmoothingUtil = new ShapeSmoothingUtil();
+		
 		invertedLut = imp.isInvertedLut();
 		if (imp == null || imp.getType() != ImagePlus.GRAY8) {
 			IJ.error("Only 8-Bit Grayscale Imags are supported");
@@ -129,10 +132,11 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 		gd.addSlider("Relative_proportion_FDs (%)", 0, 100, 2);
 		gd.addSlider("Absolute_number_FDs", 1, maxNumOfFDs, 2);
 		//dialogItemChanged(gd, null);
+		gd.addCheckbox("Use absolute value as minimum*", false);
 		gd.addCheckbox("Draw only contours", false);
 		gd.addCheckbox("Output Descriptors", false);
-
 		gd.addCheckbox("Black Background", blackBackground);
+		gd.addMessage("* Only relevant if you keep a relative proportion of FDS");
 		Scrollbar absScroll = (Scrollbar) gd.getSliders().get(1);
 		TextField absTextField = (TextField) gd.getNumericFields().get(1);
 		absScroll.setEnabled(false);
@@ -149,6 +153,14 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 		thresholdValueAbsolute = (int) gd.getNextNumber();
 		String choice = gd.getNextChoice();
 		doAbsoluteThreshold = (choice.equals(absRelChoices[1]));
+		useMinimum = gd.getNextBoolean();
+		minimum = (int)thresholdValueAbsolute;
+		if(useMinimum){
+			shapeSmoothingUtil.setMinimumNumberOfFD(minimum);
+		}else{
+			shapeSmoothingUtil.setMinimumNumberOfFD(1);
+		}
+		
 		drawOnlyContours = gd.getNextBoolean();
 		doOutputDescriptors = gd.getNextBoolean();
 		blackBackground = gd.getNextBoolean();
@@ -166,6 +178,13 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 		modusChoice = (Choice) geDi.getChoices().get(0);
 		
 		doAbsoluteThreshold = absRelChoices[1].equals(choice);
+		useMinimum = geDi.getNextBoolean();
+		minimum = (int)thresholdValueAbsolute;
+		if(useMinimum){
+			shapeSmoothingUtil.setMinimumNumberOfFD(minimum);
+		}else{
+			shapeSmoothingUtil.setMinimumNumberOfFD(1);
+		}
 		drawOnlyContours = geDi.getNextBoolean();
 		doOutputDescriptors = geDi.getNextBoolean();
 		blackBackground = geDi.getNextBoolean();
@@ -180,8 +199,8 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 		TextField relTextField = (TextField) geDi.getNumericFields().get(0);
 
 		boolean relSelected = absRelChoices[0].equals(choice);
-		absScroll.setEnabled(!relSelected);
-		absTextField.setEnabled(!relSelected);
+		absScroll.setEnabled(!relSelected || useMinimum);
+		absTextField.setEnabled(!relSelected || useMinimum);
 		relScroll.setEnabled(relSelected);
 		relTextField.setEnabled(relSelected);
 		
