@@ -79,6 +79,15 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 			return DONE;
 		}
 		//YesNoCancelDialog diag = new YesNoCancelDialog(ImageWindow.getFrames()[0], "Background", "Black background?");
+		
+		
+		
+		return DOES_8G | DOES_STACKS;
+	}
+	
+	@Override
+	public void run(ImageProcessor ip) {
+		ImagePlus imp = new ImagePlus("",ip.duplicate());
 		ImageStatistics stats = imp.getStatistics();
 
 		blackBackground = (stats.histogram[0]>stats.histogram[255]); //diag.yesPressed();
@@ -110,13 +119,6 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 		}
 		
 		maxNumOfFDs = tempMaxNumOfFDs;
-		
-		
-		return DOES_8G;
-	}
-	
-	@Override
-	public void run(ImageProcessor ip) {		
 		doFourierFilter(ip);
 	}
 	
