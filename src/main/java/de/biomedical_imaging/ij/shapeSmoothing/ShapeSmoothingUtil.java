@@ -166,15 +166,14 @@ public class ShapeSmoothingUtil {
 		
 		Polygon equiCont = toEquidistantPolygon(contourPolygon);
 		int numOfContourPoints = equiCont.npoints;
-		
+
 		if (thresholdIsPercentual) {
 			thresholdValue = (thresholdValue * numOfContourPoints) / 100;
 			thresholdValue = thresholdValue<minimumFD?minimumFD:thresholdValue;
-		} else {
-			// thresholdValue darf nicht die Anzahl der Konturpunkte übersteigen!
-			if (thresholdValue > numOfContourPoints) {
-				thresholdValue = numOfContourPoints;
-			}
+		}
+		// thresholdValue darf nicht die Anzahl der Konturpunkte übersteigen!
+		if (thresholdValue > numOfContourPoints) {
+			thresholdValue = numOfContourPoints;
 		}
 			
 		// Konturpunkte in die "richtige" Datenstrukturübertragen
@@ -197,7 +196,7 @@ public class ShapeSmoothingUtil {
 		// Fourier-Hintransformation
 		ft.complexForward(contourPoints);		
 		double[] coefficients = new double[(int)thresholdValue*2+1];
-		
+
 		for(int i = 0; i < (int)thresholdValue*2; i=i+2){
 			coefficients[i] = contourPoints[i];
 			coefficients[i+1] = contourPoints[i+1];
