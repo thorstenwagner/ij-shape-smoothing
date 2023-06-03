@@ -44,6 +44,8 @@ import java.util.Vector;
 import de.biomedical_imaging.ij.shapeSmoothingSlow.ComplexNumber;
 import de.biomedical_imaging.ij.shapeSmoothingSlow.MyUsefulMethods;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
+import ij.plugin.RoiEnlarger;
+import ij.plugin.*;
 
 /**
  * 
@@ -52,7 +54,8 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
  */
 public class ShapeSmoothingUtil {	
 
-	private boolean onlyContours = false;
+	private boolean drawContours = false;
+	private boolean fillObjects = true;
 	private boolean blackBackground = false;
 	private int minimumFD;
 	
@@ -143,14 +146,42 @@ public class ShapeSmoothingUtil {
 		minimumFD = minimum;
 	}
 	
-	public void setDrawOnlyContours(boolean b){
-		onlyContours = b;
+	public void setDrawContours(boolean b){
+		drawContours = b;
+	}
+	
+	public void setFillObjects(boolean b) {
+		fillObjects = b;
 	}
 	
 	public void setBlackBackground(boolean b){
 		blackBackground = b;
 	}
 	
+	
+	private double[] calc_fourier_coefficients(Polygon equiCont) {
+		
+		double[] contourPoints = new double[2 * equiCont.npoints];
+		
+		// Konturpunkte in die "richtige" Datenstrukturübertragen
+		/*
+		 * a[2*k] = Re[k], 
+		 * a[2*k+1] = Im[k], 0<=k<n
+		 */
+		int j = 0;
+		for(int i = 0; i < equiCont.npoints; i++) {
+			contourPoints[j] = equiCont.xpoints[i];
+			contourPoints[j+1] = equiCont.ypoints[i];
+			j=j+2;
+		}
+		DoubleFFT_1D ft = new DoubleFFT_1D(equiCont.npoints);
+
+				
+		// Fourier-Hintransformation
+		ft.complexForward(contourPoints);	
+		
+		return contourPoints;
+	}
 	/**
 	 * Fourier-Hintransformation, Filterung der Fourierdeskriptoren (FD) und Fourier-Rücktransformation
 	 * für einen Blob (referenziert mittels contourPolygon). 
@@ -176,60 +207,47 @@ public class ShapeSmoothingUtil {
 			thresholdValue = numOfContourPoints;
 		}
 			
-		// Konturpunkte in die "richtige" Datenstrukturübertragen
-
-		/*
-		 * a[2*k] = Re[k], 
-		 * a[2*k+1] = Im[k], 0<=k<n
-		 */
-		double[] contourPoints = new double[2 * numOfContourPoints];
+	
+		double[] all_coefficients = calc_fourier_coefficients(equiCont);
 		
-		int j = 0;
-		for(int i = 0; i < numOfContourPoints; i++) {
-			contourPoints[j] = equiCont.xpoints[i];
-			contourPoints[j+1] = equiCont.ypoints[i];
-			j=j+2;
-		}
-		DoubleFFT_1D ft = new DoubleFFT_1D(numOfContourPoints);
-
-				
-		// Fourier-Hintransformation
-		ft.complexForward(contourPoints);		
-		double[] coefficients = new double[(int)thresholdValue*2+1];
+		
+		// Filterung
+		double[] filtered_coefficients = new double[(int)thresholdValue*2+1];
 
 		for(int i = 0; i < (int)thresholdValue*2; i=i+2){
-			coefficients[i] = contourPoints[i];
-			coefficients[i+1] = contourPoints[i+1];
+			filtered_coefficients[i] = all_coefficients[i];
+			filtered_coefficients[i+1] = all_coefficients[i+1];
 		}
 		
-		// Filterung	
+		
 	
 		int loopFrom = (int)thresholdValue;
 		if (loopFrom % 2 != 0) {
 			loopFrom = loopFrom + 1;
 		}
-		int loopUntil = contourPoints.length - (int)thresholdValue;
+		int loopUntil = all_coefficients.length - (int)thresholdValue;
 		if (loopUntil % 2 != 0) {
 			loopUntil = loopUntil + 1;
 		}
 		
 		for (int i = loopFrom; i < loopUntil; i++) {
-			contourPoints[i] = 0;
+			all_coefficients[i] = 0;
 		}
 		
 			
 		// Rücktransformation
-		ft.complexInverse(contourPoints, true);
-		int[] xpoints = new int[contourPoints.length/2];
-		int[] ypoints = new int[contourPoints.length/2];
+		DoubleFFT_1D ft = new DoubleFFT_1D(equiCont.npoints);
+		ft.complexInverse(all_coefficients, true);
+		int[] xpoints = new int[all_coefficients.length/2];
+		int[] ypoints = new int[all_coefficients.length/2];
 		
-		j=0;
-		for(int i = 0; i < contourPoints.length; i=i+2) {
-			xpoints[j] = (int) Math.round(contourPoints[i]);
-			ypoints[j] = (int) Math.round(contourPoints[i+1]);
+		int j=0;
+		for(int i = 0; i < all_coefficients.length; i=i+2) {
+			xpoints[j] = (int) Math.round(all_coefficients[i]);
+			ypoints[j] = (int) Math.round(all_coefficients[i+1]);
 			j++;
 		}
-
+		
 		if(blackBackground){
 			ip.setValue(255);
 			if(isInner){
@@ -243,14 +261,37 @@ public class ShapeSmoothingUtil {
 				ip.setValue(255);
 			}
 		}
+		
+	
 		Polygon poly = new Polygon(xpoints, ypoints, j);
 		// Zeichnen
-		if(onlyContours){
+		Polygon pl = null;
+		int enlarge=0;
+		int roiType = Roi.TRACED_ROI;
+		if(drawContours == true & fillObjects == false) {
 			ip.drawPolygon(poly);
-		}else{
+		}
+		else if(drawContours == true & fillObjects == true){
+			ip.fillPolygon(poly);
+			ip.setValue(255);
+			if(blackBackground) {
+				ip.setValue(0);
+			}
+			try {
+				// This try catch is necessary as it otherwise crashes during preview in some cases.
+				Roi roi = new PolygonRoi(poly,roiType);
+				Roi newRoi = RoiEnlarger.enlarge(roi, enlarge);
+				pl = newRoi.getPolygon();
+				ip.drawPolygon(pl);
+			} catch(NullPointerException e) {
+				ip.drawPolygon(poly);
+			}
+		}
+		else if(drawContours == false & fillObjects == true) {
 			ip.drawPolygon(poly);
 			ip.fillPolygon(poly);
 		}
+		
 		
 		if(output){
 			Frame frame = WindowManager.getFrame("ROI Manager");
@@ -258,12 +299,20 @@ public class ShapeSmoothingUtil {
 				IJ.run("ROI Manager...");
 			frame = WindowManager.getFrame("ROI Manager");
 			RoiManager roiManager = (RoiManager) frame;
-			Roi roi = new PolygonRoi(poly,Roi.TRACED_ROI);
+			Roi roi = new PolygonRoi(poly,roiType);
 			roiManager.add(IJ.getImage(), roi,objectCounter);
 			objectCounter++;
 		}
 		
-		return coefficients;
+		return filtered_coefficients;
+	}
+	
+	public void drawPolygon(ImageProcessor ip, Polygon p) {
+		
+		ip.moveTo(p.xpoints[0], p.ypoints[0]);
+		for (int i=0; i<p.npoints; i++)
+			ip.lineTo(p.xpoints[i], p.ypoints[i]);
+		ip.lineTo(p.xpoints[0], p.ypoints[0]);
 	}
 	
 	public Polygon toEquidistantPolygon(Polygon pol){

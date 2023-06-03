@@ -56,8 +56,9 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 	private double thresholdValueAbsolute;
 	private Choice modusChoice ;
 	private boolean doAbsoluteThreshold;
-	private boolean drawOnlyContours;
+	private boolean drawContours;
 	private boolean blackBackground;
+	private boolean fillContours = true;
 	private boolean doOutputDescriptors = false;
 	private boolean useMinimum = false;
 	private int minimum;
@@ -135,9 +136,10 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 		gd.addSlider("Absolute_number_FDs", 1, maxNumOfFDs, 2);
 		//dialogItemChanged(gd, null);
 		gd.addCheckbox("Use absolute value as minimum*", false);
-		gd.addCheckbox("Draw only contours", false);
+		gd.addCheckbox("Draw contours", drawContours);
 		gd.addCheckbox("Output Descriptors", false);
 		gd.addCheckbox("Black Background", blackBackground);
+		gd.addCheckbox("Fill contours", fillContours);
 		gd.addMessage("* Only relevant if you keep a relative proportion of FDS");
 		Scrollbar absScroll = (Scrollbar) gd.getSliders().get(1);
 		TextField absTextField = (TextField) gd.getNumericFields().get(1);
@@ -163,9 +165,10 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 			shapeSmoothingUtil.setMinimumNumberOfFD(1);
 		}
 		
-		drawOnlyContours = gd.getNextBoolean();
+		drawContours = gd.getNextBoolean();
 		doOutputDescriptors = gd.getNextBoolean();
 		blackBackground = gd.getNextBoolean();
+		fillContours = gd.getNextBoolean();
 		previewing = false;
 		return IJ.setupDialog(imp, DOES_8G);
 	}
@@ -187,9 +190,10 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 		}else{
 			shapeSmoothingUtil.setMinimumNumberOfFD(1);
 		}
-		drawOnlyContours = geDi.getNextBoolean();
+		drawContours = geDi.getNextBoolean();
 		doOutputDescriptors = geDi.getNextBoolean();
 		blackBackground = geDi.getNextBoolean();
+		fillContours = geDi.getNextBoolean();
 
 		double actPercentValue = thresholdValuePercentual;
 		double actAbsoluteValue = thresholdValueAbsolute;
@@ -233,7 +237,8 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 	
 	private void doFourierFilter(ImageProcessor ip) {
 		
-		shapeSmoothingUtil.setDrawOnlyContours(drawOnlyContours);
+		shapeSmoothingUtil.setDrawContours(drawContours);
+		shapeSmoothingUtil.setFillObjects(fillContours);
 		shapeSmoothingUtil.setBlackBackground(blackBackground);
 		
 		if (doAbsoluteThreshold) {

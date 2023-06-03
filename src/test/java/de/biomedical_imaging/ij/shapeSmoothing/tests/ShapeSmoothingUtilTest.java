@@ -155,7 +155,9 @@ public class ShapeSmoothingUtilTest {
 				maxNumOfContourPoints = blobsNumOfContourPoints;
 			}			
 		}
-		shapeSmoothingUtil.setDrawOnlyContours(true);
+		shapeSmoothingUtil.setDrawContours(true);
+		shapeSmoothingUtil.setFillObjects(false);
+		
 		shapeSmoothingUtil.fourierFilter(testImp.getProcessor(), (double)maxNumOfContourPoints, false, false);
 
 		assertTrue(testImageEquality(testImp.getProcessor().getIntArray(), newIp.getIntArray()));
