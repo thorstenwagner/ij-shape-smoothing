@@ -140,7 +140,6 @@ public class Shape_Smoothing implements ExtendedPlugInFilter, DialogListener {
 		gd.addCheckbox("Output Descriptors", false);
 		gd.addCheckbox("Black Background", blackBackground);
 		gd.addCheckbox("Fill contours", fillContours);
-		run("ParticleSizerJson", "true false to/the/config.json")
 		gd.addMessage("* Only relevant if you keep a relative proportion of FDS");
 		Scrollbar absScroll = (Scrollbar) gd.getSliders().get(1);
 		TextField absTextField = (TextField) gd.getNumericFields().get(1);
