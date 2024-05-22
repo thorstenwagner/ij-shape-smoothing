@@ -323,12 +323,20 @@ public class ShapeSmoothingUtil {
 			int nextPixel = (i+1)==pol.npoints? 1 : i+1;
 			int dx = pol.xpoints[i] - pol.xpoints[nextPixel];
 			int dy = pol.ypoints[i] - pol.ypoints[nextPixel];
-			if((dx == -1 && dy ==-1) || (dx == 1 && dy ==1)){
-				equiPol.addPoint(pol.xpoints[nextPixel],  pol.ypoints[i] );
+			if(dx == -1 && dy ==-1){
+				equiPol.addPoint(pol.xpoints[i],  pol.ypoints[nextPixel] );
+			}
+			
+			if(dx == 1 && dy ==1) {
+				equiPol.addPoint(pol.xpoints[i],  pol.ypoints[nextPixel] );
 			}
 
-			else if((dx == -1 && dy == 1) || (dx == 1 && dy == -1)){
-				equiPol.addPoint(pol.xpoints[i],  pol.ypoints[nextPixel]);
+			if(dx == -1 && dy == 1){
+				equiPol.addPoint(pol.xpoints[nextPixel],  pol.ypoints[i]);
+			}
+			
+			if(dx == 1 && dy == -1) {
+				equiPol.addPoint(pol.xpoints[nextPixel],  pol.ypoints[i]);
 			}
 		}
 		return equiPol;
